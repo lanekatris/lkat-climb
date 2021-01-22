@@ -29,7 +29,7 @@ Is a quicker way to start with Expo + Firebase projects. It includes:
 $ npx create-react-native-app --template https://github.com/expo-community/expo-firebase-starter
 ```
 
-2. Rename the file `example.firebaseConfig.js` to `firebaseConfig.js`
+2. Rename the file `firebaseConfig.js` to `firebaseConfig.js`
 3. Update `firebaseConfig.js` with your own configuration, e.g.:
 
 ```js

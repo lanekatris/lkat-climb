@@ -1,11 +1,39 @@
-import React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {View, StyleSheet, ScrollView} from 'react-native';
+import 'firebase/firestore';
 
 import useStatusBar from '../hooks/useStatusBar';
 import { logout } from '../components/Firebase/firebase';
+import {Button, Header, ListItem, SocialIcon, ThemeProvider} from 'react-native-elements';
+import * as firebase from 'firebase';
+import {AuthUserContext} from "../navigation/AuthUserProvider";
+import {nanoid} from 'nanoid';
+import createClimb from "../commands/create-climb";
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
+
+  const [climbs,setClimbs] = useState([]);
+
+  const climbsRef = firebase.firestore().collection('climbs');
+  const {user:{uid}} = useContext(AuthUserContext);
+  console.log('data',{uid,climbs})
+
+  useEffect(() => {
+    climbsRef.where('userId','==', uid)
+      .onSnapshot(querySnapshot => {
+        const newClimbs = [];
+        querySnapshot.forEach(doc => {
+          const newClimb = doc.data();
+          newClimb.id = doc.id;
+          newClimbs.push(newClimb);
+        })
+        setClimbs(newClimbs);
+      }, error => {
+        console.error(error)
+      })
+  }, [])
+
   async function handleSignOut() {
     try {
       await logout();
@@ -13,10 +41,45 @@ export default function HomeScreen() {
       console.log(error);
     }
   }
+
+  // function create(){
+  //   // console.log('create')
+  //   // const payload = {
+  //   //   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  //   //   name: `${new Intl.DateTimeFormat().format()}-${nanoid()}`,
+  //   //   userId: uid
+  //   // }
+  //   // climbsRef.add(payload).then(doc => {
+  //   //   console.log('done')
+  //   // }).catch(err => {
+  //   //   console.error(err);
+  //   // })
+  //   createClimb(uid);
+  // }
+
   return (
-    <View style={styles.container}>
-      <Button title="Sign Out" onPress={handleSignOut} />
-    </View>
+    // <ThemeProvider>
+    <ScrollView>
+
+      {/*<Header centerComponent={{text: 'Your Climbs'}} />*/}
+      {
+        climbs.map(climb => <ListItem key={climb.id} onPress={() => {
+          console.log('click', climb)
+        }}>
+          <ListItem.Content>
+            <ListItem.Title>{climb.name}</ListItem.Title>
+          </ListItem.Content>
+          <ListItem.Chevron />
+        </ListItem>)
+      }
+  {/*<Button title="Sign Out" onPress={handleSignOut} />*/}
+  {/*    <Button title="Create" onPress={create} />*/}
+      {/*<SocialIcon*/}
+      {/*  button*/}
+      {/*  title="Create"*/}
+      {/*/>*/}
+    </ScrollView>
+    // </ThemeProvider>
   );
 }
 
