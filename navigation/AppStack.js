@@ -11,6 +11,8 @@ import ClimbScreen from "../screens/ClimbScreen";
 
 const Stack = createStackNavigator();
 
+export const DETAIL_VIEW_SCREEN = "Session"
+
 export default function AppStack() {
   const {user:{uid}} = useContext(AuthUserContext);
   // const navigation = useNavigation();
@@ -22,12 +24,15 @@ export default function AppStack() {
 
       options={({navigation}) => ({
         headerRight: () => <Button  type="clear" icon={<Icon name="add" type="material" onPress={async () => {
-        await createClimb(uid)
-        navigation.navigate("Complete me")
+        const newClimb = await createClimb(uid)
+          console.log('newclimb', newClimb)
+        navigation.navigate(DETAIL_VIEW_SCREEN ,newClimb)
       }} />} />
       })} />
 
-      <Stack.Screen name="Complete me" component={ClimbScreen} />
+      <Stack.Screen name={DETAIL_VIEW_SCREEN} component={ClimbScreen} options={({route}) => ({
+        title: `${route.params.name}`
+      })} />
     </Stack.Navigator>
   );
 }

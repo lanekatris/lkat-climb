@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, Text} from 'react-native';
 import 'firebase/firestore';
 
 import useStatusBar from '../hooks/useStatusBar';
@@ -7,8 +7,9 @@ import { logout } from '../components/Firebase/firebase';
 import {Button, Header, ListItem, SocialIcon, ThemeProvider} from 'react-native-elements';
 import * as firebase from 'firebase';
 import {AuthUserContext} from "../navigation/AuthUserProvider";
-import {nanoid} from 'nanoid';
 import createClimb from "../commands/create-climb";
+import {useNavigation} from "@react-navigation/core";
+import {DETAIL_VIEW_SCREEN} from "../navigation/AppStack";
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
@@ -17,7 +18,8 @@ export default function HomeScreen() {
 
   const climbsRef = firebase.firestore().collection('climbs');
   const {user:{uid}} = useContext(AuthUserContext);
-  console.log('data',{uid,climbs})
+  const navigation=useNavigation();
+  // console.log('data',{uid,climbs})
 
   useEffect(() => {
     climbsRef.where('userId','==', uid)
@@ -65,6 +67,7 @@ export default function HomeScreen() {
       {
         climbs.map(climb => <ListItem key={climb.id} onPress={() => {
           console.log('click', climb)
+          navigation.navigate(DETAIL_VIEW_SCREEN, climb)
         }}>
           <ListItem.Content>
             <ListItem.Title>{climb.name}</ListItem.Title>
@@ -72,6 +75,7 @@ export default function HomeScreen() {
           <ListItem.Chevron />
         </ListItem>)
       }
+      {climbs.length === 0 && <Text>No climbs, get at it above!</Text>}
   {/*<Button title="Sign Out" onPress={handleSignOut} />*/}
   {/*    <Button title="Create" onPress={create} />*/}
       {/*<SocialIcon*/}
