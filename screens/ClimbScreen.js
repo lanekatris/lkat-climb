@@ -3,14 +3,52 @@ import React, {useContext, useEffect, useState} from 'react';
 import {useNavigation} from "@react-navigation/core";
 import {AuthUserContext} from "../navigation/AuthUserProvider";
 import { ListItem, Avatar,Icon, Button } from 'react-native-elements'
+import * as firebase from 'firebase';
 
 const grades =[0,1,2,3,4,5,6,7,8,9,10,11,12]
+const climbsRef = firebase.firestore().collection('climbs');
 
 export default function ClimbScreen({route}) {
   const {user:{uid}} = useContext(AuthUserContext);
-  const {params:{id,name}} = route
+  const {params:{id,name}} = route;
+  const [climb,setClimb] = useState({});
+  const [ref,setRef] = useState();
 
-  console.log('grades',grades)
+
+useEffect(() => {
+  console.log('Watching record',{uid, id})
+  const _ref = climbsRef
+    .doc(id);
+  setRef(_ref);
+
+    _ref.onSnapshot(doc => {
+      // console.log('detail osnapshot', querySnapshot);
+      const d = doc.data();
+      setClimb(d);
+      console.log('detail climb', d)
+    }, err=>{
+      console.error(error)
+    })
+},[])
+
+  function decrement(difficulty){
+    ref.update({
+      events: firebase.firestore.FieldValue.arrayUnion({
+        createdOn: new Date().toISOString(), //firebase.firestore.FieldValue.serverTimestamp(),
+        type: 'route-retracted',
+        difficulty
+      })
+    })
+  }
+  function increment(difficulty){
+    ref.update({
+      events: firebase.firestore.FieldValue.arrayUnion({
+        createdOn: new Date().toISOString(), //firebase.firestore.FieldValue.serverTimestamp(),
+        type: 'route-completed',
+        difficulty
+      })
+    })
+  }
 
   const FONT_SIZE=30
 
@@ -21,13 +59,19 @@ export default function ClimbScreen({route}) {
           <View style={{backgroundColor:'blue', flex:1,flexDirection:'row', justifyContent:"center"}}>
 
             <View>
-              <Button type="clear" icon={<Icon name="minus" type="material-community" size={FONT_SIZE} />} />
+              <Button type="clear" icon={<Icon name="minus" type="material-community" size={FONT_SIZE} />} onPress={() => {
+              console.log('you clicked minus for', grade)
+                decrement(grade)
+              }
+              } />
             </View>
             <View style={{justifyContent:'center'}}>
               <Text style={{fontSize:FONT_SIZE}}>V{i}</Text>
             </View>
             <View>
-              <Button type="clear" icon={<Icon name="plus" type="material-community" size={FONT_SIZE} />} />
+              <Button type="clear" icon={<Icon name="plus" type="material-community" size={FONT_SIZE} />} onPress={()=>{
+              increment(grade)}
+              }/>
             </View>
 
           </View>

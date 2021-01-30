@@ -13,7 +13,8 @@ export default function createClimb(userId) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       name: `${new Date().toLocaleDateString()} - ${dockerNames.getRandomName()}`,
       userId,
-      id: await nanoid()
+      id: await nanoid(),
+      events: []
     }
     climbsRef.add(payload).then(doc=>{
       resolve(payload)
