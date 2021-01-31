@@ -22,6 +22,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     climbsRef.where('userId','==', uid)
+      .orderBy('createdAt', 'desc')
       .onSnapshot(querySnapshot => {
         const newClimbs = [];
         querySnapshot.forEach(doc => {
