@@ -17,7 +17,10 @@ export default function createClimb(userId) {
       events: []
     }
     climbsRef.add(payload).then(doc=>{
-      resolve(payload)
+      resolve({
+        id: doc.id,
+        name:payload.name
+      })
     }).catch(reject)
   })
 

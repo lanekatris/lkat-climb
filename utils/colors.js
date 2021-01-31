@@ -8,3 +8,4 @@ export default {
   mediumGrey: '#6e6869',
   red: '#fc5c65'
 };
+export const DETAIL_VIEW_SCREEN = "Session"

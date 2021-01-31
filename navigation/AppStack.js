@@ -7,11 +7,10 @@ import {useContext} from "react";
 import {AuthUserContext} from "./AuthUserProvider";
 import createClimb from "../commands/create-climb";
 import ClimbScreen from "../screens/ClimbScreen";
+import {DETAIL_VIEW_SCREEN} from "../utils/colors";
 // import {useNavigation} from "@react-navigation/native";
 
 const Stack = createStackNavigator();
-
-export const DETAIL_VIEW_SCREEN = "Session"
 
 export default function AppStack() {
   const {user:{uid}} = useContext(AuthUserContext);

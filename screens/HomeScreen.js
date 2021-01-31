@@ -9,7 +9,7 @@ import * as firebase from 'firebase';
 import {AuthUserContext} from "../navigation/AuthUserProvider";
 import createClimb from "../commands/create-climb";
 import {useNavigation} from "@react-navigation/core";
-import {DETAIL_VIEW_SCREEN} from "../navigation/AppStack";
+import {DETAIL_VIEW_SCREEN} from "../utils/colors";
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
@@ -67,7 +67,7 @@ export default function HomeScreen() {
       {
         climbs.map(climb => <ListItem key={climb.id} onPress={() => {
           // console.log('click', climb)
-          navigation.navigate(DETAIL_VIEW_SCREEN, climb)
+          navigation.navigate(DETAIL_VIEW_SCREEN, {id: climb.id,name: climb.name})
         }}>
           <ListItem.Content>
             <ListItem.Title>{climb.name}</ListItem.Title>
