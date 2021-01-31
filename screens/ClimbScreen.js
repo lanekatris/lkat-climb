@@ -1,52 +1,14 @@
 import {ScrollView, Text, View} from "react-native";
-import React, {useContext, useDebugValue, useEffect, useState} from 'react';
+import React from 'react';
 import {ListItem, Avatar, Icon, Button} from 'react-native-elements'
-import * as firebase from 'firebase';
 import useClimbScreen from "../hooks/useClimbScreen";
 import {GRADES} from "../utils/colors";
-
-const climbsRef = firebase.firestore().collection('climbs');
-
-async function getPreviousClimbStats(uid, createdAt) {
-  const previousClimbRef = await climbsRef
-    .where('userId', '==', uid)
-    .where('createdAt', '<', createdAt)
-    .orderBy('createdAt', 'desc')
-    .limit(1)
-    .get()
-  const previousClimb = previousClimbRef.empty ? null : previousClimbRef.docs[0].data()
-
-  const previousStats = {};
-  GRADES.forEach(grade => {
-    previousStats[grade] = 0
-  })
-
-  // if (!previousClimb) return previousStats;
-
-  if (previousClimb) {
-    previousClimb.events.forEach(({createdOn, difficulty, type}) => {
-      switch (type) {
-        case 'route-retracted':
-          previousStats[difficulty]--;
-          break;
-        case 'route-completed':
-          previousStats[difficulty]++;
-          break;
-        default:
-          console.warn('unknown', {createdOn, difficulty, type})
-          break;
-      }
-    })
-  }
-
-  return previousStats;
-}
 
 const FONT_SIZE = 30
 
 export default function ClimbScreen({route}) {
   const {params: {id}} = route;
-  const {climb, increment, decrement} = useClimbScreen({documentId: id});
+  const {climb, goals, increment, decrement} = useClimbScreen({documentId: id});
 
   return <ScrollView>
     {
@@ -75,7 +37,7 @@ export default function ClimbScreen({route}) {
           </View>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: "center"}}>
             <View style={{justifyContent: 'center'}}>
-              <Text style={{fontSize: FONT_SIZE}}>{climb.stats[grade].current}/{climb.stats[grade].goal}</Text>
+              <Text style={{fontSize: FONT_SIZE}}>{climb.stats[grade].current}/{goals[grade]}</Text>
             </View>
             <View style={{justifyContent: 'center'}}>
               <Icon name={climb.stats[grade].emoji} type="material-community" size={FONT_SIZE}

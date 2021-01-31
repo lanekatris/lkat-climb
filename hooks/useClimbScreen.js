@@ -1,8 +1,13 @@
 import * as firebase from 'firebase';
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {GRADES} from "../utils/colors";
+import {AuthUserContext} from "../navigation/AuthUserProvider";
 
 const climbsRef = firebase.firestore().collection('climbs');
+const DEFAULT_PREVIOUS_STATS = {};
+GRADES.forEach(grade => {
+  DEFAULT_PREVIOUS_STATS[grade] = '...'
+})
 
 function createEvent(type, difficulty) {
   return {
@@ -22,9 +27,45 @@ function getEmoji({current, goal}) {
   throw new Error('unknown', {current, goal})
 }
 
+async function getPreviousClimbStats(uid, createdAt) {
+  const previousClimbRef = await climbsRef
+    .where('userId', '==', uid)
+    .where('createdAt', '<', createdAt)
+    .orderBy('createdAt', 'desc')
+    .limit(1)
+    .get()
+
+  const previousClimb = previousClimbRef.empty ? null : previousClimbRef.docs[0].data()
+
+  const previousStats = {};
+  GRADES.forEach(grade => {
+    previousStats[grade] = 0
+  })
+
+  if (previousClimb) {
+    previousClimb.events.forEach(({createdOn, difficulty, type}) => {
+      switch (type) {
+        case 'route-retracted':
+          previousStats[difficulty]--;
+          break;
+        case 'route-completed':
+          previousStats[difficulty]++;
+          break;
+        default:
+          console.warn('unknown', {createdOn, difficulty, type})
+          break;
+      }
+    })
+  }
+
+  return previousStats;
+}
+
 function useClimbScreen({documentId}){
+  const {user:{uid}} = useContext(AuthUserContext);
   const [climb, setClimb] = useState({});
   const [documentRef, setDocumentRef] = useState();
+  const [goals, setGoals] = useState(DEFAULT_PREVIOUS_STATS);
 
   function onSnapshot(doc){
     if (!doc.exists) return;
@@ -56,7 +97,6 @@ function useClimbScreen({documentId}){
     })
 
     d.stats = stats;
-
     setClimb(d)
   }
 
@@ -67,6 +107,17 @@ function useClimbScreen({documentId}){
     return ()=>subscriber();
   }, [documentId])
 
+  useEffect(() => {
+    if (!climb) return;
+    if (!climb.createdAt) return;
+
+    console.log('load previous stats bro');
+    getPreviousClimbStats(uid, climb.createdAt)
+      .then(_previousStats => {
+        setGoals(_previousStats)
+      })
+  }, [climb])
+
   function incrementOrDecrement(type, difficulty) {
     return documentRef.update({
       events: firebase.firestore.FieldValue.arrayUnion(createEvent(type, difficulty))
@@ -75,6 +126,7 @@ function useClimbScreen({documentId}){
 
   return {
     climb,
+    goals,
     increment: difficulty => incrementOrDecrement('route-completed', difficulty),
     decrement: difficulty => incrementOrDecrement('route-retracted', difficulty)
   }

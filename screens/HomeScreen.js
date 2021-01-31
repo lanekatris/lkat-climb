@@ -7,7 +7,7 @@ import { logout } from '../components/Firebase/firebase';
 import {Button, Header, ListItem, SocialIcon, ThemeProvider} from 'react-native-elements';
 import * as firebase from 'firebase';
 import {AuthUserContext} from "../navigation/AuthUserProvider";
-import createClimb from "../commands/create-climb";
+
 import {useNavigation} from "@react-navigation/core";
 import {DETAIL_VIEW_SCREEN} from "../utils/colors";
 
@@ -19,7 +19,6 @@ export default function HomeScreen() {
   const climbsRef = firebase.firestore().collection('climbs');
   const {user:{uid}} = useContext(AuthUserContext);
   const navigation=useNavigation();
-  // console.log('data',{uid,climbs})
 
   useEffect(() => {
     climbsRef.where('userId','==', uid)
@@ -44,26 +43,8 @@ export default function HomeScreen() {
     }
   }
 
-  // function create(){
-  //   // console.log('create')
-  //   // const payload = {
-  //   //   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  //   //   name: `${new Intl.DateTimeFormat().format()}-${nanoid()}`,
-  //   //   userId: uid
-  //   // }
-  //   // climbsRef.add(payload).then(doc => {
-  //   //   console.log('done')
-  //   // }).catch(err => {
-  //   //   console.error(err);
-  //   // })
-  //   createClimb(uid);
-  // }
-
   return (
-    // <ThemeProvider>
     <ScrollView>
-
-      {/*<Header centerComponent={{text: 'Your Climbs'}} />*/}
       {
         climbs.map(climb => <ListItem key={climb.id} onPress={() => {
           // console.log('click', climb)
@@ -76,14 +57,7 @@ export default function HomeScreen() {
         </ListItem>)
       }
       {climbs.length === 0 && <Text>No climbs, get at it above!</Text>}
-  {/*<Button title="Sign Out" onPress={handleSignOut} />*/}
-  {/*    <Button title="Create" onPress={create} />*/}
-      {/*<SocialIcon*/}
-      {/*  button*/}
-      {/*  title="Create"*/}
-      {/*/>*/}
     </ScrollView>
-    // </ThemeProvider>
   );
 }
 
