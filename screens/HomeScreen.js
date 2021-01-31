@@ -1,15 +1,16 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, StyleSheet, ScrollView, Text} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import 'firebase/firestore';
 
 import useStatusBar from '../hooks/useStatusBar';
 import { logout } from '../components/Firebase/firebase';
-import {Button, Header, ListItem, SocialIcon, ThemeProvider} from 'react-native-elements';
+import {Button, Header, ListItem, Text, SocialIcon, ThemeProvider, Divider} from 'react-native-elements';
 import * as firebase from 'firebase';
 import {AuthUserContext} from "../navigation/AuthUserProvider";
 
 import {useNavigation} from "@react-navigation/core";
 import {DETAIL_VIEW_SCREEN} from "../utils/colors";
+import {getStatsForClimb} from "../hooks/useClimbScreen";
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
@@ -28,6 +29,7 @@ export default function HomeScreen() {
         querySnapshot.forEach(doc => {
           const newClimb = doc.data();
           newClimb.id = doc.id;
+          newClimb.stats = getStatsForClimb(newClimb)
           newClimbs.push(newClimb);
         })
         setClimbs(newClimbs);
@@ -48,11 +50,15 @@ export default function HomeScreen() {
     <ScrollView>
       {
         climbs.map(climb => <ListItem key={climb.id} onPress={() => {
-          // console.log('click', climb)
           navigation.navigate(DETAIL_VIEW_SCREEN, {id: climb.id,name: climb.name})
         }}>
           <ListItem.Content>
             <ListItem.Title>{climb.name}</ListItem.Title>
+            <ListItem.Subtitle>
+              <Stat amount={climb.stats.totalClimbs} text="Climbs" />
+              <Seperator />
+              <Stat amount={climb.stats.maxGrade} text="Max Grade" />
+            </ListItem.Subtitle>
           </ListItem.Content>
           <ListItem.Chevron />
         </ListItem>)
@@ -60,6 +66,14 @@ export default function HomeScreen() {
       {climbs.length === 0 && <Text>No climbs, get at it above!</Text>}
     </ScrollView>
   );
+}
+
+function Seperator(){
+  return <Text> - </Text>
+}
+
+function Stat({amount, text}){
+  return <Text><Text style={{fontWeight: 'bold'}}>{amount}</Text> {text}</Text>
 }
 
 const styles = StyleSheet.create({

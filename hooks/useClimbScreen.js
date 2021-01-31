@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 import {useContext, useEffect, useState} from "react";
 import {GRADES} from "../utils/colors";
 import {AuthUserContext} from "../navigation/AuthUserProvider";
+import maxBy from 'lodash/maxBy'
 
 const climbsRef = firebase.firestore().collection('climbs');
 const DEFAULT_PREVIOUS_STATS = {};
@@ -61,6 +62,44 @@ async function getPreviousClimbStats(uid, createdAt) {
   return previousStats;
 }
 
+export function getStatsForClimb(climb){
+  const stats = {}
+  GRADES.forEach(grade => {
+    stats[grade] = {
+      current: 0
+    }
+  })
+
+  climb.events.forEach(({createdOn, difficulty, type}) => {
+    switch (type) {
+      case 'route-retracted':
+        stats[difficulty].current--;
+        break;
+      case 'route-completed':
+        stats[difficulty].current++;
+        break;
+      default:
+        console.warn('unknown', {createdOn, difficulty, type})
+        break;
+    }
+
+    stats[difficulty].emoji = getEmoji(stats[difficulty])
+  })
+
+  stats.totalClimbs = Object.values(stats).reduce((total, num) => {return total + Math.round(num.current)}, 0)
+
+  let maxGrade = 'n/a';
+  Object.keys(stats).forEach(key => {
+    const val = stats[key];
+    if (val.current > 0) {
+      maxGrade = `V${key}`
+    }
+  })
+  stats.maxGrade = maxGrade
+
+  return stats;
+}
+
 function useClimbScreen({documentId}){
   const {user:{uid}} = useContext(AuthUserContext);
   const [climb, setClimb] = useState({});
@@ -72,31 +111,7 @@ function useClimbScreen({documentId}){
 
     const d = doc.data();
 
-    const stats = {}
-    GRADES.forEach(grade => {
-      stats[grade] = {
-        current: 0,
-        goal: 0
-      }
-    })
-
-    d.events.forEach(({createdOn, difficulty, type}) => {
-      switch (type) {
-        case 'route-retracted':
-          stats[difficulty].current--;
-          break;
-        case 'route-completed':
-          stats[difficulty].current++;
-          break;
-        default:
-          console.warn('unknown', {createdOn, difficulty, type})
-          break;
-      }
-
-      stats[difficulty].emoji = getEmoji(stats[difficulty])
-    })
-
-    d.stats = stats;
+    d.stats = getStatsForClimb(d)
     setClimb(d)
   }
 
