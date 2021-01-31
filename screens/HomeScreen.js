@@ -66,7 +66,7 @@ export default function HomeScreen() {
       {/*<Header centerComponent={{text: 'Your Climbs'}} />*/}
       {
         climbs.map(climb => <ListItem key={climb.id} onPress={() => {
-          console.log('click', climb)
+          // console.log('click', climb)
           navigation.navigate(DETAIL_VIEW_SCREEN, climb)
         }}>
           <ListItem.Content>
