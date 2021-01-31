@@ -1,20 +1,11 @@
 import {ScrollView, Text, View} from "react-native";
 import React, {useContext, useDebugValue, useEffect, useState} from 'react';
-import {AuthUserContext} from "../navigation/AuthUserProvider";
 import {ListItem, Avatar, Icon, Button} from 'react-native-elements'
 import * as firebase from 'firebase';
+import useClimbScreen from "../hooks/useClimbScreen";
+import {GRADES} from "../utils/colors";
 
-const grades = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 const climbsRef = firebase.firestore().collection('climbs');
-
-function getEmoji({current, goal}) {
-  if (current < 0) return 'emoticon-poop-outline';
-  if (current === 0) return 'emoticon-frown-outline';
-  if (current === goal) return 'emoticon-cool-outline';
-  if (current > goal) return 'emoticon-devil-outline';
-  if (current > 0) return 'emoticon-happy-outline';
-  throw new Error('unknown', {current, goal})
-}
 
 async function getPreviousClimbStats(uid, createdAt) {
   const previousClimbRef = await climbsRef
@@ -26,7 +17,7 @@ async function getPreviousClimbStats(uid, createdAt) {
   const previousClimb = previousClimbRef.empty ? null : previousClimbRef.docs[0].data()
 
   const previousStats = {};
-  grades.forEach(grade => {
+  GRADES.forEach(grade => {
     previousStats[grade] = 0
   })
 
@@ -51,84 +42,15 @@ async function getPreviousClimbStats(uid, createdAt) {
   return previousStats;
 }
 
+const FONT_SIZE = 30
+
 export default function ClimbScreen({route}) {
-  const {user: {uid}} = useContext(AuthUserContext);
-  const {params: {id, name}} = route;
-  const [climb, setClimb] = useState({});
-  const [ref, setRef] = useState();
-  // const [previousClimbStats, setPreviousClimbStats]=useState();
-
-  useEffect(() => {
-    const _ref = climbsRef
-      .doc(id);
-    setRef(_ref);
-
-    const subscriber = _ref.onSnapshot({includeMetadataChanges: true}, async doc => {
-      const d = doc.data();
-
-      if (!d) {
-        return;
-      }
-
-      const stats = {}
-      grades.forEach(grade => {
-        stats[grade] = {
-          current: 0,
-          goal: 0
-        }
-      })
-      d.events.forEach(({createdOn, difficulty, type}) => {
-        switch (type) {
-          case 'route-retracted':
-            stats[difficulty].current--;
-            break;
-          case 'route-completed':
-            stats[difficulty].current++;
-            break;
-          default:
-            console.warn('unknown', {createdOn, difficulty, type})
-            break;
-        }
-
-        stats[difficulty].emoji = getEmoji(stats[difficulty])
-      })
-
-      d.stats = stats;
-      setClimb(d);
-    }, err => {
-      console.error(error)
-    })
-
-    return () => subscriber();
-  }, [id])
-
-  function decrement(difficulty) {
-    ref.update({
-      events: firebase.firestore.FieldValue.arrayUnion({
-        createdOn: new Date().toISOString(), //firebase.firestore.FieldValue.serverTimestamp(),
-        type: 'route-retracted',
-        difficulty,
-        version: 1
-      })
-    })
-  }
-
-  function increment(difficulty) {
-    ref.update({
-      events: firebase.firestore.FieldValue.arrayUnion({
-        createdOn: new Date().toISOString(), //firebase.firestore.FieldValue.serverTimestamp(),
-        type: 'route-completed',
-        difficulty,
-        version: 1
-      })
-    })
-  }
-
-  const FONT_SIZE = 30
+  const {params: {id}} = route;
+  const {climb, increment, decrement} = useClimbScreen({documentId: id});
 
   return <ScrollView>
     {
-      climb && climb.stats && grades.map((grade, i) => <ListItem key={i} bottomDivider>
+      climb && climb.stats && GRADES.map((grade, i) => <ListItem key={i} bottomDivider>
         <ListItem.Content style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: "center"}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: "center"}}>
 
