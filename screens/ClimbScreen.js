@@ -24,6 +24,27 @@ useEffect(() => {
     _ref.onSnapshot(doc => {
       // console.log('detail osnapshot', querySnapshot);
       const d = doc.data();
+
+      // Take the data and find out total values
+      const stats = {}
+      grades.forEach(grade => {
+        stats[grade] = 0
+      })
+      d.events.forEach(({createdOn, difficulty, type}) => {
+        switch (type){
+          case 'route-retracted':
+            stats[difficulty]--;
+            break;
+          case 'route-completed':
+            stats[difficulty]++;
+            break;
+          default:
+            console.warn('unknown',{createdOn, difficulty, type})
+            break;
+        }
+      })
+
+      d.stats=stats;
       setClimb(d);
       console.log('detail climb', d)
     }, err=>{
@@ -36,7 +57,8 @@ useEffect(() => {
       events: firebase.firestore.FieldValue.arrayUnion({
         createdOn: new Date().toISOString(), //firebase.firestore.FieldValue.serverTimestamp(),
         type: 'route-retracted',
-        difficulty
+        difficulty,
+        version: 1
       })
     })
   }
@@ -45,7 +67,8 @@ useEffect(() => {
       events: firebase.firestore.FieldValue.arrayUnion({
         createdOn: new Date().toISOString(), //firebase.firestore.FieldValue.serverTimestamp(),
         type: 'route-completed',
-        difficulty
+        difficulty,
+        version: 1
       })
     })
   }
@@ -54,7 +77,7 @@ useEffect(() => {
 
   return <ScrollView>
     {
-      grades.map((grade,i) => <ListItem key={i} bottomDivider>
+      climb && climb.stats && grades.map((grade,i) => <ListItem key={i} bottomDivider>
         <ListItem.Content style={{flex:1,flexDirection:'row',backgroundColor:'red', alignItems:'stretch', justifyContent:"center"}}>
           <View style={{backgroundColor:'blue', flex:1,flexDirection:'row', justifyContent:"center"}}>
 
@@ -77,7 +100,7 @@ useEffect(() => {
           </View>
           <View style={{backgroundColor:'orange', flex:1,flexDirection:'row', justifyContent:"center"}}>
             <View style={{justifyContent:'center'}}>
-              <Text style={{fontSize:FONT_SIZE}}>0/4</Text>
+              <Text style={{fontSize:FONT_SIZE}}>{climb.stats[grade]}/?</Text>
             </View>
             <View style={{justifyContent:'center'}}>
               <Icon name="emoticon-dead" type="material-community" size={FONT_SIZE} style={{marginLeft:10}} />
