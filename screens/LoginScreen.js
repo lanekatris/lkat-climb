@@ -13,14 +13,11 @@ import FormErrorMessage from '../components/Forms/FormErrorMessage';
 import useStatusBar from '../hooks/useStatusBar';
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .required('Please enter a registered email')
-    .email()
-    .label('Email'),
+  email: Yup.string().required('Please enter a registered email').email().label('Email'),
   password: Yup.string()
     .required()
     .min(6, 'Password must have at least 6 characters')
-    .label('Password')
+    .label('Password'),
 });
 
 export default function LoginScreen({ navigation }) {
@@ -55,7 +52,7 @@ export default function LoginScreen({ navigation }) {
       <Form
         initialValues={{ email: '', password: '' }}
         validationSchema={validationSchema}
-        onSubmit={values => handleOnLogin(values)}
+        onSubmit={(values) => handleOnLogin(values)}
       >
         <FormField
           name="email"
@@ -64,7 +61,7 @@ export default function LoginScreen({ navigation }) {
           autoCapitalize="none"
           keyboardType="email-address"
           textContentType="emailAddress"
-          autoFocus={true}
+          autoFocus
         />
         <FormField
           name="password"
@@ -77,8 +74,8 @@ export default function LoginScreen({ navigation }) {
           rightIcon={rightIcon}
           handlePasswordVisibility={handlePasswordVisibility}
         />
-        <FormButton title={'Login'} />
-        {<FormErrorMessage error={loginError} visible={true} />}
+        <FormButton title="Login" />
+        <FormErrorMessage error={loginError} visible />
       </Form>
       <View style={styles.footerButtonContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
@@ -99,20 +96,20 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 15,
-    backgroundColor: Colors.mediumGrey
+    backgroundColor: Colors.mediumGrey,
   },
   footerButtonContainer: {
     marginVertical: 15,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   forgotPasswordButtonText: {
     color: Colors.white,
     fontSize: 18,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   backButton: {
     justifyContent: 'center',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 });

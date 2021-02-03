@@ -1,31 +1,31 @@
 import * as firebase from 'firebase';
-import {useContext, useEffect, useState} from "react";
-import {GRADES} from "../utils/colors";
-import {AuthUserContext} from "../navigation/AuthUserProvider";
-import maxBy from 'lodash/maxBy'
+import { useContext, useEffect, useState } from 'react';
+import maxBy from 'lodash/maxBy';
+import { GRADES } from '../utils/colors';
+import { AuthUserContext } from '../navigation/AuthUserProvider';
 
 const climbsRef = firebase.firestore().collection('climbs');
 const DEFAULT_PREVIOUS_STATS = {};
-GRADES.forEach(grade => {
-  DEFAULT_PREVIOUS_STATS[grade] = '...'
-})
+GRADES.forEach((grade) => {
+  DEFAULT_PREVIOUS_STATS[grade] = '...';
+});
 
 export function createEvent(type, difficulty) {
   return {
     createdOn: new Date().toISOString(),
     type,
     difficulty,
-    version: 1
-  }
+    version: 1,
+  };
 }
 
-function getEmoji({current, goal}) {
+function getEmoji({ current, goal }) {
   if (current < 0) return 'emoticon-poop-outline';
   if (current === 0) return 'emoticon-frown-outline';
   if (current === goal) return 'emoticon-cool-outline';
   if (current > goal) return 'emoticon-devil-outline';
   if (current > 0) return 'emoticon-happy-outline';
-  throw new Error('unknown', {current, goal})
+  throw new Error('unknown', { current, goal });
 }
 
 async function getPreviousClimbStats(uid, createdAt) {
@@ -35,17 +35,17 @@ async function getPreviousClimbStats(uid, createdAt) {
     .where('createdAt', '<', createdAt)
     .orderBy('createdAt', 'desc')
     .limit(1)
-    .get()
+    .get();
 
-  const previousClimb = previousClimbRef.empty ? null : previousClimbRef.docs[0].data()
+  const previousClimb = previousClimbRef.empty ? null : previousClimbRef.docs[0].data();
 
   const previousStats = {};
-  GRADES.forEach(grade => {
-    previousStats[grade] = 0
-  })
+  GRADES.forEach((grade) => {
+    previousStats[grade] = 0;
+  });
 
   if (previousClimb) {
-    previousClimb.events.forEach(({createdOn, difficulty, type}) => {
+    previousClimb.events.forEach(({ createdOn, difficulty, type }) => {
       switch (type) {
         case 'route-retracted':
           previousStats[difficulty]--;
@@ -54,24 +54,24 @@ async function getPreviousClimbStats(uid, createdAt) {
           previousStats[difficulty]++;
           break;
         default:
-          console.warn('unknown', {createdOn, difficulty, type})
+          console.warn('unknown', { createdOn, difficulty, type });
           break;
       }
-    })
+    });
   }
 
   return previousStats;
 }
 
-export function getStatsForClimb(climb){
-  const stats = {}
-  GRADES.forEach(grade => {
+export function getStatsForClimb(climb) {
+  const stats = {};
+  GRADES.forEach((grade) => {
     stats[grade] = {
-      current: 0
-    }
-  })
+      current: 0,
+    };
+  });
 
-  climb.events.forEach(({createdOn, difficulty, type}) => {
+  climb.events.forEach(({ createdOn, difficulty, type }) => {
     switch (type) {
       case 'route-retracted':
         stats[difficulty].current--;
@@ -80,74 +80,78 @@ export function getStatsForClimb(climb){
         stats[difficulty].current++;
         break;
       default:
-        console.warn('unknown', {createdOn, difficulty, type})
+        console.warn('unknown', { createdOn, difficulty, type });
         break;
     }
 
-    if (['route-retracted','route-complted'].includes(type)) {
-      stats[difficulty].emoji = getEmoji(stats[difficulty])
+    if (['route-retracted', 'route-complted'].includes(type)) {
+      stats[difficulty].emoji = getEmoji(stats[difficulty]);
     }
-  })
+  });
 
-  stats.totalClimbs = Object.values(stats).reduce((total, num) => {return total + Math.round(num.current)}, 0)
+  stats.totalClimbs = Object.values(stats).reduce(
+    (total, num) => total + Math.round(num.current),
+    0
+  );
 
   let maxGrade = 'n/a';
-  Object.keys(stats).forEach(key => {
+  Object.keys(stats).forEach((key) => {
     const val = stats[key];
     if (val.current > 0) {
-      maxGrade = `V${key}`
+      maxGrade = `V${key}`;
     }
-  })
-  stats.maxGrade = maxGrade
+  });
+  stats.maxGrade = maxGrade;
 
   return stats;
 }
 
-function useClimbScreen({documentId}){
-  const {user:{uid}} = useContext(AuthUserContext);
+function useClimbScreen({ documentId }) {
+  const {
+    user: { uid },
+  } = useContext(AuthUserContext);
   const [climb, setClimb] = useState({});
   const [documentRef, setDocumentRef] = useState();
   const [goals, setGoals] = useState(DEFAULT_PREVIOUS_STATS);
 
-  function onSnapshot(doc){
+  function onSnapshot(doc) {
     if (!doc.exists) return;
 
     const d = doc.data();
 
-    d.stats = getStatsForClimb(d)
-    setClimb(d)
+    d.stats = getStatsForClimb(d);
+    setClimb(d);
   }
 
   useEffect(() => {
     const _ref = climbsRef.doc(documentId);
     setDocumentRef(_ref);
-    const subscriber = _ref.onSnapshot(onSnapshot, err => console.error(err))
-    return ()=>subscriber();
-  }, [documentId])
+    const subscriber = _ref.onSnapshot(onSnapshot, (err) => console.error(err));
+    return () => subscriber();
+  }, [documentId]);
 
   useEffect(() => {
     if (!climb) return;
     if (!climb.createdAt) return;
 
     console.log('load previous stats bro');
-    getPreviousClimbStats(uid, climb.createdAt)
-      .then(_previousStats => {
-        setGoals(_previousStats)
-      })
-  }, [climb])
+    getPreviousClimbStats(uid, climb.createdAt).then((_previousStats) => {
+      setGoals(_previousStats);
+    });
+  }, [climb]);
 
   function incrementOrDecrement(type, difficulty) {
     return documentRef.update({
-      events: firebase.firestore.FieldValue.arrayUnion(createEvent(type, difficulty))
-    })
+      events: firebase.firestore.FieldValue.arrayUnion(createEvent(type, difficulty)),
+    });
   }
 
   return {
     climb,
     goals,
-    increment: difficulty => incrementOrDecrement('route-completed', difficulty),
-    decrement: difficulty => incrementOrDecrement('route-retracted', difficulty)
-  }
+    increment: (difficulty) => incrementOrDecrement('route-completed', difficulty),
+    decrement: (difficulty) => incrementOrDecrement('route-retracted', difficulty),
+  };
 }
 
 export default useClimbScreen;

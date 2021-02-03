@@ -1,39 +1,49 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {View, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import 'firebase/firestore';
 
+import {
+  Button,
+  Header,
+  ListItem,
+  SocialIcon,
+  ThemeProvider,
+  Divider,
+  Text,
+} from 'react-native-elements';
+import { useNavigation } from '@react-navigation/core';
 import useStatusBar from '../hooks/useStatusBar';
-import {Button, Header, ListItem, SocialIcon, ThemeProvider, Divider, Text} from 'react-native-elements';
 
-import {useNavigation} from "@react-navigation/core";
-import {DETAIL_VIEW_SCREEN} from "../utils/colors";
+import { DETAIL_VIEW_SCREEN } from '../utils/colors';
 import useClimbs from '../hooks/useClimbs';
-import { RefreshControl } from 'react-native';
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
 
-  const navigation=useNavigation();
-  const {climbs, loading, error, getClimbs} = useClimbs();
+  const navigation = useNavigation();
+  const { climbs, loading, error, getClimbs } = useClimbs();
 
   const handleRefresh = useCallback(() => {
-    getClimbs()
-  }, [getClimbs])
+    getClimbs();
+  }, [getClimbs]);
 
   if (loading) {
-    return <ActivityIndicator size="large" />
+    return <ActivityIndicator size="large" />;
   }
 
   if (error) {
-    return <Text>{JSON.stringify(error)}</Text>
+    return <Text>{JSON.stringify(error)}</Text>;
   }
 
   return (
     <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}>
-      {
-        climbs.map(climb => <ListItem key={climb.id} onPress={() => {
-          navigation.navigate(DETAIL_VIEW_SCREEN, {id: climb.id,name: climb.name})
-        }}>
+      {climbs.map((climb) => (
+        <ListItem
+          key={climb.id}
+          onPress={() => {
+            navigation.navigate(DETAIL_VIEW_SCREEN, { id: climb.id, name: climb.name });
+          }}
+        >
           <ListItem.Content>
             <ListItem.Title>{climb.name}</ListItem.Title>
             <ListItem.Subtitle>
@@ -43,23 +53,27 @@ export default function HomeScreen() {
             </ListItem.Subtitle>
           </ListItem.Content>
           <ListItem.Chevron />
-        </ListItem>)
-      }
+        </ListItem>
+      ))}
       {!loading && climbs.length === 0 && <Text>No climbs, get at it above!</Text>}
     </ScrollView>
   );
 }
 
-function Seperator(){
-  return <Text> - </Text>
+function Seperator() {
+  return <Text> - </Text>;
 }
 
-function Stat({amount, text}){
-  return <Text><Text style={{fontWeight: 'bold'}}>{amount}</Text> {text}</Text>
+function Stat({ amount, text }) {
+  return (
+    <Text>
+      <Text style={{ fontWeight: 'bold' }}>{amount}</Text> {text}
+    </Text>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });

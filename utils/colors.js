@@ -6,8 +6,8 @@ export default {
   ghostWhite: '#f8f8ff',
   lightGrey: '#f9f9f9',
   mediumGrey: '#6e6869',
-  red: '#fc5c65'
+  red: '#fc5c65',
 };
-export const DETAIL_VIEW_SCREEN = "Session"
+export const DETAIL_VIEW_SCREEN = 'Session';
 
-export const GRADES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+export const GRADES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

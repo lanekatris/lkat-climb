@@ -31,26 +31,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: Colors.mediumGrey
+    backgroundColor: Colors.mediumGrey,
   },
   logoContainer: {
     position: 'absolute',
     top: 60,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   logo: {
     width: 125,
-    height: 125
+    height: 125,
   },
   subtitle: {
     fontSize: 24,
     fontWeight: '600',
     paddingVertical: 20,
-    color: Colors.primary
+    color: Colors.primary,
   },
   buttonContainer: {
     padding: 20,
     paddingBottom: 60,
-    width: '100%'
-  }
+    width: '100%',
+  },
 });

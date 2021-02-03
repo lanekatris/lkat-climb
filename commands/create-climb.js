@@ -1,28 +1,30 @@
 import * as firebase from 'firebase';
 import * as Random from 'expo-random';
 import 'firebase/firestore';
-import dockerNames from 'docker-names'
-import {nanoid} from 'nanoid/async/index.native';
+import dockerNames from 'docker-names';
+import { nanoid } from 'nanoid/async/index.native';
 
 const climbsRef = firebase.firestore().collection('climbs');
 
 export default function createClimb(userId) {
   return new Promise(async (resolve, reject) => {
-    console.log('create')
+    console.log('create');
     const payload = {
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       name: `${new Date().toLocaleDateString()} - ${dockerNames.getRandomName()}`,
       userId,
       id: await nanoid(),
       events: [],
-      deleted: false
-    }
-    climbsRef.add(payload).then(doc=>{
-      resolve({
-        id: doc.id,
-        name:payload.name
+      deleted: false,
+    };
+    climbsRef
+      .add(payload)
+      .then((doc) => {
+        resolve({
+          id: doc.id,
+          name: payload.name,
+        });
       })
-    }).catch(reject)
-  })
-
+      .catch(reject);
+  });
 }

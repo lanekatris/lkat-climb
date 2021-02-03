@@ -14,7 +14,7 @@ export default function Routes() {
 
   useEffect(() => {
     // onAuthStateChanged returns an unsubscriber
-    const unsubscribeAuth = auth.onAuthStateChanged(async authUser => {
+    const unsubscribeAuth = auth.onAuthStateChanged(async (authUser) => {
       try {
         await (authUser ? setUser(authUser) : setUser(null));
         setIsLoading(false);

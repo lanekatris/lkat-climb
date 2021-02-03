@@ -13,20 +13,15 @@ import { registerWithEmail } from '../components/Firebase/firebase';
 import useStatusBar from '../hooks/useStatusBar';
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .required()
-    .label('Name'),
-  email: Yup.string()
-    .required('Please enter a valid email')
-    .email()
-    .label('Email'),
+  name: Yup.string().required().label('Name'),
+  email: Yup.string().required('Please enter a valid email').email().label('Email'),
   password: Yup.string()
     .required()
     .min(6, 'Password must have at least 6 characters')
     .label('Password'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Confirm Password must match Password')
-    .required('Confirm Password is required')
+    .required('Confirm Password is required'),
 });
 
 export default function RegisterScreen({ navigation }) {
@@ -35,9 +30,7 @@ export default function RegisterScreen({ navigation }) {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [rightIcon, setRightIcon] = useState('eye');
   const [confirmPasswordIcon, setConfirmPasswordIcon] = useState('eye');
-  const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(
-    true
-  );
+  const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(true);
   const [registerError, setRegisterError] = useState('');
 
   function handlePasswordVisibility() {
@@ -76,17 +69,12 @@ export default function RegisterScreen({ navigation }) {
           name: '',
           email: '',
           password: '',
-          confirmPassword: ''
+          confirmPassword: '',
         }}
         validationSchema={validationSchema}
-        onSubmit={values => handleOnSignUp(values)}
+        onSubmit={(values) => handleOnSignUp(values)}
       >
-        <FormField
-          name="name"
-          leftIcon="account"
-          placeholder="Enter name"
-          autoFocus={true}
-        />
+        <FormField name="name" leftIcon="account" placeholder="Enter name" autoFocus />
         <FormField
           name="email"
           leftIcon="email"
@@ -117,8 +105,8 @@ export default function RegisterScreen({ navigation }) {
           rightIcon={confirmPasswordIcon}
           handlePasswordVisibility={handleConfirmPasswordVisibility}
         />
-        <FormButton title={'Register'} />
-        {<FormErrorMessage error={registerError} visible={true} />}
+        <FormButton title="Register" />
+        <FormErrorMessage error={registerError} visible />
       </Form>
       <IconButton
         style={styles.backButton}
@@ -134,11 +122,11 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 15,
-    backgroundColor: Colors.mediumGrey
+    backgroundColor: Colors.mediumGrey,
   },
   backButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10
-  }
+    marginVertical: 10,
+  },
 });

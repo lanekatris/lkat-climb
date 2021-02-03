@@ -16,7 +16,7 @@ const validationSchema = Yup.object().shape({
   email: Yup.string()
     .label('Email')
     .email('Enter a valid email')
-    .required('Please enter a registered email')
+    .required('Please enter a registered email'),
 });
 
 export default function ForgotPasswordScreen({ navigation }) {
@@ -40,7 +40,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       <Form
         initialValues={{ email: '' }}
         validationSchema={validationSchema}
-        onSubmit={values => handlePasswordReset(values)}
+        onSubmit={(values) => handlePasswordReset(values)}
       >
         <FormField
           name="email"
@@ -49,10 +49,10 @@ export default function ForgotPasswordScreen({ navigation }) {
           autoCapitalize="none"
           keyboardType="email-address"
           textContentType="emailAddress"
-          autoFocus={true}
+          autoFocus
         />
         <FormButton title="Forgot Password" />
-        {<FormErrorMessage error={customError} visible={true} />}
+        <FormErrorMessage error={customError} visible />
       </Form>
       <IconButton
         style={styles.backButton}
@@ -68,11 +68,11 @@ export default function ForgotPasswordScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 15,
-    backgroundColor: Colors.mediumGrey
+    backgroundColor: Colors.mediumGrey,
   },
   backButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10
-  }
+    marginVertical: 10,
+  },
 });
