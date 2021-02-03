@@ -1,50 +1,21 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
 import 'firebase/firestore';
 
 import useStatusBar from '../hooks/useStatusBar';
-import { logout } from '../components/Firebase/firebase';
 import {Button, Header, ListItem, Text, SocialIcon, ThemeProvider, Divider} from 'react-native-elements';
-import * as firebase from 'firebase';
-import {AuthUserContext} from "../navigation/AuthUserProvider";
 
 import {useNavigation} from "@react-navigation/core";
 import {DETAIL_VIEW_SCREEN} from "../utils/colors";
-import {getStatsForClimb} from "../hooks/useClimbScreen";
+import useClimbs from '../hooks/useClimbs';
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
 
-  const [climbs,setClimbs] = useState([]);
-
-  const climbsRef = firebase.firestore().collection('climbs');
-  const {user:{uid}} = useContext(AuthUserContext);
   const navigation=useNavigation();
+  const {climbs, loading, error} = useClimbs();
 
-  useEffect(() => {
-    climbsRef.where('userId','==', uid)
-      .orderBy('createdAt', 'desc')
-      .onSnapshot(querySnapshot => {
-        const newClimbs = [];
-        querySnapshot.forEach(doc => {
-          const newClimb = doc.data();
-          newClimb.id = doc.id;
-          newClimb.stats = getStatsForClimb(newClimb)
-          newClimbs.push(newClimb);
-        })
-        setClimbs(newClimbs);
-      }, error => {
-        console.error(error)
-      })
-  }, [])
-
-  async function handleSignOut() {
-    try {
-      await logout();
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  if (loading) return <ActivityIndicator size="large" />;
 
   return (
     <ScrollView>
@@ -63,7 +34,7 @@ export default function HomeScreen() {
           <ListItem.Chevron />
         </ListItem>)
       }
-      {climbs.length === 0 && <Text>No climbs, get at it above!</Text>}
+      {!loading && climbs.length === 0 && <Text>No climbs, get at it above!</Text>}
     </ScrollView>
   );
 }
