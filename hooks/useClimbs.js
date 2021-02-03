@@ -13,7 +13,9 @@ function useClimbs() {
 
     const getClimbs = useCallback(() => {
         setLoading(true);
-        climbsRef.where('userId','==', uid)
+        climbsRef
+          .where('userId','==', uid)
+          .where('deleted', '==', false)
           .orderBy('createdAt', 'desc')
           .onSnapshot(querySnapshot => {
             const newClimbs = [];

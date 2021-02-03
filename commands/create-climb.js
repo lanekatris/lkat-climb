@@ -14,7 +14,8 @@ export default function createClimb(userId) {
       name: `${new Date().toLocaleDateString()} - ${dockerNames.getRandomName()}`,
       userId,
       id: await nanoid(),
-      events: []
+      events: [],
+      deleted: false
     }
     climbsRef.add(payload).then(doc=>{
       resolve({

@@ -10,7 +10,7 @@ GRADES.forEach(grade => {
   DEFAULT_PREVIOUS_STATS[grade] = '...'
 })
 
-function createEvent(type, difficulty) {
+export function createEvent(type, difficulty) {
   return {
     createdOn: new Date().toISOString(),
     type,
@@ -31,6 +31,7 @@ function getEmoji({current, goal}) {
 async function getPreviousClimbStats(uid, createdAt) {
   const previousClimbRef = await climbsRef
     .where('userId', '==', uid)
+    .where('deleted', '==', false)
     .where('createdAt', '<', createdAt)
     .orderBy('createdAt', 'desc')
     .limit(1)
@@ -83,7 +84,9 @@ export function getStatsForClimb(climb){
         break;
     }
 
-    stats[difficulty].emoji = getEmoji(stats[difficulty])
+    if (['route-retracted','route-complted'].includes(type)) {
+      stats[difficulty].emoji = getEmoji(stats[difficulty])
+    }
   })
 
   stats.totalClimbs = Object.values(stats).reduce((total, num) => {return total + Math.round(num.current)}, 0)

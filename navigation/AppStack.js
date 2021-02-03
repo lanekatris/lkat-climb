@@ -1,7 +1,9 @@
 import * as React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
+import * as firebase from 'firebase';
 
 import HomeScreen from '../screens/HomeScreen';
+import {Alert} from 'react-native';
 import {Button, Icon} from 'react-native-elements';
 import {useContext} from "react";
 import {AuthUserContext} from "./AuthUserProvider";
@@ -12,9 +14,12 @@ import {DETAIL_VIEW_SCREEN} from "../utils/colors";
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SettingsScreen from "../screens/SettingsScreen";
+import {createEvent} from '../hooks/useClimbScreen'
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+
+const climbsRef = firebase.firestore().collection('climbs');
 
 function AppStack() {
   const {user: {uid}} = useContext(AuthUserContext);
@@ -36,8 +41,25 @@ function AppStack() {
                                                    }}/>}/>,
                       })}/>
 
-        <Stack.Screen name={DETAIL_VIEW_SCREEN} component={ClimbScreen} options={({route}) => ({
-          title: `${route.params.name}`
+        <Stack.Screen name={DETAIL_VIEW_SCREEN} component={ClimbScreen} options={({route, navigation}) => ({
+          title: `${route.params.name}`,
+          headerRight: () => <Button type="clear" icon={<Icon name="remove-circle"  color="red" type="material" onPress={() => {
+            Alert.alert('Delete Climb', 'Are you sure you want to delte this climb?', [
+              {
+                text: 'No'
+              },
+              {
+                text: 'Yes',
+                onPress:  async () => {
+                  await climbsRef.doc(route.params.id).update({
+                    deleted: true,
+                    events: firebase.firestore.FieldValue.arrayUnion(createEvent('deleted', 'n/a'))
+                  })
+                  navigation.navigate('Your Climbs');
+                }
+              }
+            ], {cancelable: false})
+          }} />} />
         })}/>
       </Stack.Navigator>
     </>
