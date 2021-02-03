@@ -15,7 +15,9 @@ export default function HomeScreen() {
   const navigation=useNavigation();
   const {climbs, loading, error} = useClimbs();
 
-  if (loading) return <ActivityIndicator size="large" />;
+  if (loading) {
+    return <ActivityIndicator size="large" />
+  }
 
   return (
     <ScrollView>

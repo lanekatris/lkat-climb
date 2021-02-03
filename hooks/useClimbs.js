@@ -1,5 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as firebase from 'firebase';
+import {AuthUserContext} from '../navigation/AuthUserProvider'
+import {getStatsForClimb} from './useClimbScreen'
 
 const climbsRef = firebase.firestore().collection('climbs');
 
