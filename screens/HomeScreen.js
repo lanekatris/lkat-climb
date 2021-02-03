@@ -1,26 +1,35 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
 import 'firebase/firestore';
 
 import useStatusBar from '../hooks/useStatusBar';
-import {Button, Header, ListItem, Text, SocialIcon, ThemeProvider, Divider} from 'react-native-elements';
+import {Button, Header, ListItem, SocialIcon, ThemeProvider, Divider, Text} from 'react-native-elements';
 
 import {useNavigation} from "@react-navigation/core";
 import {DETAIL_VIEW_SCREEN} from "../utils/colors";
 import useClimbs from '../hooks/useClimbs';
+import { RefreshControl } from 'react-native';
 
 export default function HomeScreen() {
   useStatusBar('dark-content');
 
   const navigation=useNavigation();
-  const {climbs, loading, error} = useClimbs();
+  const {climbs, loading, error, getClimbs} = useClimbs();
+
+  const handleRefresh = useCallback(() => {
+    getClimbs()
+  }, [getClimbs])
 
   if (loading) {
     return <ActivityIndicator size="large" />
   }
 
+  if (error) {
+    return <Text>{JSON.stringify(error)}</Text>
+  }
+
   return (
-    <ScrollView>
+    <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}>
       {
         climbs.map(climb => <ListItem key={climb.id} onPress={() => {
           navigation.navigate(DETAIL_VIEW_SCREEN, {id: climb.id,name: climb.name})

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import * as firebase from 'firebase';
 import {AuthUserContext} from '../navigation/AuthUserProvider'
 import {getStatsForClimb} from './useClimbScreen'
@@ -11,7 +11,7 @@ function useClimbs() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState();
 
-    useEffect(() => {
+    const getClimbs = useCallback(() => {
         setLoading(true);
         climbsRef.where('userId','==', uid)
           .orderBy('createdAt', 'desc')
@@ -30,12 +30,17 @@ function useClimbs() {
             setError(_error);
             setLoading(false);
           })
+    }, [uid])
+
+    useEffect(() => {
+        getClimbs();
       }, [])
 
     return {
         climbs,
         loading,
-        error
+        error,
+        getClimbs
     }
 }
 
