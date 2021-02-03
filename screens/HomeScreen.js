@@ -3,7 +3,7 @@ import { ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import 'firebase/firestore';
 
 import { ListItem, Text } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/native';
 import useStatusBar from '../hooks/useStatusBar';
 
 import { DETAIL_VIEW_SCREEN } from '../utils/colors';

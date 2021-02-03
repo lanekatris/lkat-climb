@@ -27,76 +27,74 @@ function AppStack() {
   console.log('uid', uid);
 
   return (
-    <>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Your Climbs"
-          component={HomeScreen}
-          options={({ navigation }) => ({
-            headerRight: () => (
-              <Button
-                type="clear"
-                icon={
-                  <Icon
-                    name="add"
-                    type="material"
-                    onPress={async () => {
-                      const newClimb = await createClimb(uid);
-                      console.log('newclimb', newClimb);
-                      navigation.navigate(DETAIL_VIEW_SCREEN, newClimb);
-                    }}
-                  />
-                }
-              />
-            ),
-          })}
-        />
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Your Climbs"
+        component={HomeScreen}
+        options={({ navigation }) => ({
+          headerRight: () => (
+            <Button
+              type="clear"
+              icon={
+                <Icon
+                  name="add"
+                  type="material"
+                  onPress={async () => {
+                    const newClimb = await createClimb(uid);
+                    console.log('newclimb', newClimb);
+                    navigation.navigate(DETAIL_VIEW_SCREEN, newClimb);
+                  }}
+                />
+              }
+            />
+          ),
+        })}
+      />
 
-        <Stack.Screen
-          name={DETAIL_VIEW_SCREEN}
-          component={ClimbScreen}
-          options={({ route, navigation }) => ({
-            title: `${route.params.name}`,
-            headerRight: () => (
-              <Button
-                type="clear"
-                icon={
-                  <Icon
-                    name="remove-circle"
-                    color="red"
-                    type="material"
-                    onPress={() => {
-                      Alert.alert(
-                        'Delete Climb',
-                        'Are you sure you want to delte this climb?',
-                        [
-                          {
-                            text: 'No',
+      <Stack.Screen
+        name={DETAIL_VIEW_SCREEN}
+        component={ClimbScreen}
+        options={({ route, navigation }) => ({
+          title: `${route.params.name}`,
+          headerRight: () => (
+            <Button
+              type="clear"
+              icon={
+                <Icon
+                  name="remove-circle"
+                  color="red"
+                  type="material"
+                  onPress={() => {
+                    Alert.alert(
+                      'Delete Climb',
+                      'Are you sure you want to delte this climb?',
+                      [
+                        {
+                          text: 'No',
+                        },
+                        {
+                          text: 'Yes',
+                          onPress: async () => {
+                            await climbsRef.doc(route.params.id).update({
+                              deleted: true,
+                              events: firebase.firestore.FieldValue.arrayUnion(
+                                createEvent('deleted', 'n/a')
+                              ),
+                            });
+                            navigation.navigate('Your Climbs');
                           },
-                          {
-                            text: 'Yes',
-                            onPress: async () => {
-                              await climbsRef.doc(route.params.id).update({
-                                deleted: true,
-                                events: firebase.firestore.FieldValue.arrayUnion(
-                                  createEvent('deleted', 'n/a')
-                                ),
-                              });
-                              navigation.navigate('Your Climbs');
-                            },
-                          },
-                        ],
-                        { cancelable: false }
-                      );
-                    }}
-                  />
-                }
-              />
-            ),
-          })}
-        />
-      </Stack.Navigator>
-    </>
+                        },
+                      ],
+                      { cancelable: false }
+                    );
+                  }}
+                />
+              }
+            />
+          ),
+        })}
+      />
+    </Stack.Navigator>
   );
 }
 
