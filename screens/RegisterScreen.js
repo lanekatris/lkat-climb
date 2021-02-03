@@ -53,7 +53,7 @@ export default function RegisterScreen({ navigation }) {
     }
   }
 
-  async function handleOnSignUp(values, actions) {
+  async function handleOnSignUp(values) {
     const { email, password } = values;
     try {
       await registerWithEmail(email, password);

@@ -1,6 +1,5 @@
 import * as firebase from 'firebase';
 import { useContext, useEffect, useState } from 'react';
-import maxBy from 'lodash/maxBy';
 import { GRADES } from '../utils/colors';
 import { AuthUserContext } from '../navigation/AuthUserProvider';
 
@@ -48,10 +47,10 @@ async function getPreviousClimbStats(uid, createdAt) {
     previousClimb.events.forEach(({ createdOn, difficulty, type }) => {
       switch (type) {
         case 'route-retracted':
-          previousStats[difficulty]--;
+          previousStats[difficulty] -= 1;
           break;
         case 'route-completed':
-          previousStats[difficulty]++;
+          previousStats[difficulty] += 1;
           break;
         default:
           console.warn('unknown', { createdOn, difficulty, type });
@@ -74,10 +73,10 @@ export function getStatsForClimb(climb) {
   climb.events.forEach(({ createdOn, difficulty, type }) => {
     switch (type) {
       case 'route-retracted':
-        stats[difficulty].current--;
+        stats[difficulty].current -= 1;
         break;
       case 'route-completed':
-        stats[difficulty].current++;
+        stats[difficulty].current += 1;
         break;
       default:
         console.warn('unknown', { createdOn, difficulty, type });

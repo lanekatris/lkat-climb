@@ -1,6 +1,6 @@
 import { ScrollView, Text, View } from 'react-native';
 import React from 'react';
-import { ListItem, Avatar, Icon, Button } from 'react-native-elements';
+import { ListItem, Icon, Button } from 'react-native-elements';
 import useClimbScreen from '../hooks/useClimbScreen';
 import { GRADES } from '../utils/colors';
 
@@ -17,7 +17,7 @@ export default function ClimbScreen({ route }) {
       {climb &&
         climb.stats &&
         GRADES.map((grade, i) => (
-          <ListItem key={i} bottomDivider>
+          <ListItem key={grade} bottomDivider>
             <ListItem.Content
               style={{
                 flex: 1,

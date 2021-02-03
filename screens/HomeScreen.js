@@ -1,16 +1,8 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useCallback } from 'react';
+import { ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import 'firebase/firestore';
 
-import {
-  Button,
-  Header,
-  ListItem,
-  SocialIcon,
-  ThemeProvider,
-  Divider,
-  Text,
-} from 'react-native-elements';
+import { ListItem, Text } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/core';
 import useStatusBar from '../hooks/useStatusBar';
 
@@ -71,9 +63,3 @@ function Stat({ amount, text }) {
     </Text>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

@@ -5,7 +5,6 @@ import * as firebase from 'firebase';
 import { Alert } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { useContext } from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import { AuthUserContext } from './AuthUserProvider';
@@ -17,7 +16,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 import { createEvent } from '../hooks/useClimbScreen';
 
 const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
 
 const climbsRef = firebase.firestore().collection('climbs');
 
@@ -116,7 +114,7 @@ export default function BottomTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ color, size }) => {
           let iconName;
 
           if (route.name === 'Home') {

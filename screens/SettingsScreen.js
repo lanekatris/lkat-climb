@@ -1,15 +1,6 @@
 import * as React from 'react';
 import { ScrollView } from 'react-native';
-import {
-  Button,
-  Header,
-  ListItem,
-  Text,
-  SocialIcon,
-  ThemeProvider,
-  Divider,
-  Icon,
-} from 'react-native-elements';
+import { ListItem, Icon } from 'react-native-elements';
 import { logout } from '../components/Firebase/firebase';
 
 export default function SettingsScreen() {

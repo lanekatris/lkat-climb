@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import * as firebase from 'firebase';
 import { AuthUserContext } from '../navigation/AuthUserProvider';
 import { getStatsForClimb } from './useClimbScreen';
