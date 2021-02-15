@@ -67,7 +67,7 @@ function AppStack() {
                   onPress={() => {
                     Alert.alert(
                       'Delete Climb',
-                      'Are you sure you want to delte this climb?',
+                      'Are you sure you want to delete this climb?',
                       [
                         {
                           text: 'No',
