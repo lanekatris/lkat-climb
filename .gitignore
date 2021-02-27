@@ -41,3 +41,6 @@ Temporary Items
 firebaseConfig.js
 
 yarn-error.log
+
+scripts/generated.csv
+.idea/
