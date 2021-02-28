@@ -1,11 +1,10 @@
 import {FirebaseClimb, FirebaseClimbEvent} from "./interfaces";
-import {differenceBy} from "lodash";
 
 // eslint-disable-next-line require-jsdoc
 export function firebaseToBigQueryClimb(id:string, oldClimb: FirebaseClimb, newClimb: FirebaseClimb) {
   // TODO: Only create records that where we've added an event
 
-  const filteredClimbs: FirebaseClimbEvent[] = differenceBy(oldClimb.events, newClimb.events, "createdOn");
+  const filteredClimbs: FirebaseClimbEvent[] = newClimb.events.filter(({createdOn: n}) => !oldClimb.events.some(({createdOn: o}) => o===n ));
 
   return filteredClimbs.map((event) => {
     const {createdOn: eventCreatedOn, difficulty, ...rest}=event;
