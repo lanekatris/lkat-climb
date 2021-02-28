@@ -35,7 +35,6 @@ export const onUpdate = functions.firestore
       let response;
       try {
         response = await client.dataset("lkat_climb").table("climbs_1").insert(recordsToCreate);
-        // response = await client.dataset("lkat_climb").table("climbs_1").query();
       } catch (e) {
         logger.error(JSON.stringify(e, null, 2));
       }

@@ -118,3 +118,6 @@ Expo uses Firebase Web SDK and does not support all Firebase services such as ph
 <strong>Built by [@amanhimself](https://twitter.com/amanhimself)</strong>
 
 **Happy Coding!** 🎉🎉
+
+
+https://medium.com/firebase-developers/how-to-import-production-data-from-cloud-firestore-to-the-local-emulator-e82ae1c6ed8
