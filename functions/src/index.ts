@@ -1,61 +1,44 @@
 import * as functions from "firebase-functions";
-// import * as firebase from "firebase";
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+import {BigQuery} from "@google-cloud/bigquery";
+import {FirebaseClimb} from "./interfaces";
+import {firebaseToBigQueryClimb} from "./mapper";
 
-interface FirebaseClimbEvent {
-    createdOn: string
-    difficulty: number
-    type: string
-    version: number
-}
-
-interface CustomFirebaseTimestamp {
-    _seconds: number;
-    _nanoseconds: number;
-}
-
-interface FirebaseClimb {
-    createdAt: CustomFirebaseTimestamp
-    documentCreatedOn: string
-    id: string
-    events: FirebaseClimbEvent[]
-    deleted: boolean
-    userId: string
-    name: string
-}
+const {logger} = functions;
+const client = new BigQuery();
 
 export const onUpdate = functions.firestore
     .document("climbs/{climbID}")
-    .onWrite((change, context) => {
-      // console.log("onupdate", {change, context});
-      //   change.after.id
+    .onWrite(async (change, context) => {
+      if (!change.before.exists) {
+        logger.info("Document just created, not writing to BigQuery");
+        return;
+      }
 
       const climb = change.after.data() as FirebaseClimb;
 
-      const recordsToCreate = climb.events.map((event)=>{
-        const {createdOn: eventCreatedOn, ...rest}=event;
+      if (!Array.isArray(climb.events)) {
+        logger.info("climb.events is not array, exiting");
+        return;
+      }
 
-        const documentCreatedOn = new Date(1970, 0, 1);
-        documentCreatedOn.setSeconds(climb.createdAt._seconds);
+      const beforeClimb = change.before.data() as FirebaseClimb;
 
-        return {
-          documentCreatedOn: documentCreatedOn.toISOString(),
-          id: change.after.id,
-          deleted: climb.deleted,
-          userId: climb.userId,
-          name: climb.name,
-          eventCreatedOn,
-          ...rest,
-        };
-      });
+      const recordsToCreate = firebaseToBigQueryClimb(change.after.id, beforeClimb, climb);
+      logger.debug("Debug data", {recordsToCreate, climb, beforeClimb});
 
-      console.log("new", {recordsToCreate, climb});
-      return Promise.resolve();
+      if (recordsToCreate.length ===0) {
+        logger.info("No records to create");
+        return;
+      }
+
+      let response;
+      try {
+        response = await client.dataset("lkat_climb").table("climbs_1").insert(recordsToCreate);
+        // response = await client.dataset("lkat_climb").table("climbs_1").query();
+      } catch (e) {
+        logger.error(JSON.stringify(e, null, 2));
+      }
+
+      logger.debug("done writing to bigquery", response);
     });
