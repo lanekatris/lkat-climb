@@ -12,6 +12,8 @@ export default function ClimbScreen({ route }) {
   } = route;
   const { climb, goals, increment, decrement } = useClimbScreen({ documentId: id });
 
+  // console.log('debug', { climb, goals });
+
   return (
     <ScrollView>
       {climb &&

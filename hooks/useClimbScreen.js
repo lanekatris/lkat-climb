@@ -19,6 +19,8 @@ export function createEvent(type, difficulty) {
 }
 
 function getEmoji({ current, goal }) {
+  if (!goal || goal === '...') return null;
+  // console.log('getemjoi', { current, goal });
   if (current < 0) return 'emoticon-poop-outline';
   if (current === 0) return 'emoticon-frown-outline';
   if (current === goal) return 'emoticon-cool-outline';
@@ -62,7 +64,7 @@ async function getPreviousClimbStats(uid, createdAt) {
   return previousStats;
 }
 
-export function getStatsForClimb(climb) {
+export function getStatsForClimb(climb, goals) {
   const stats = {};
   GRADES.forEach((grade) => {
     stats[grade] = {
@@ -83,8 +85,14 @@ export function getStatsForClimb(climb) {
         break;
     }
 
-    if (['route-retracted', 'route-complted'].includes(type)) {
-      stats[difficulty].emoji = getEmoji(stats[difficulty]);
+    // console.log('type', type);
+    if (['route-retracted', 'route-completed'].includes(type)) {
+      // console.log('getstatsforclimb', { type, diff: stats[difficulty] });
+      // console.log('before goals', goals);
+      stats[difficulty].emoji = getEmoji({
+        current: stats[difficulty].current,
+        goal: typeof goals === 'object' ? goals[difficulty] : 0,
+      });
     }
   });
 
@@ -118,7 +126,7 @@ function useClimbScreen({ documentId }) {
 
     const d = doc.data();
 
-    d.stats = getStatsForClimb(d);
+    d.stats = getStatsForClimb(d, goals);
     setClimb(d);
   }
 
