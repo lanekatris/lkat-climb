@@ -6,6 +6,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
+    "deploy": "firebase deploy",
     "lint": "eslint navigation/**/*.js commands/**/*.js components/**/*.js hooks/**/*.js screens/**/*.js utils/**/*.js --fix"
   },
   "dependencies": {

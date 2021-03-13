@@ -3,9 +3,12 @@ import * as functions from "firebase-functions";
 import {BigQuery} from "@google-cloud/bigquery";
 import {FirebaseClimb} from "./interfaces";
 import {firebaseToBigQueryClimb} from "./mapper";
+import {AuthenticationService, Days, GymScheduleService} from "@lkat/rhinofit-unofficial";
+import * as _ from "lodash";
 
 const {logger} = functions;
 const client = new BigQuery();
+const authService = new AuthenticationService();
 
 export const onUpdate = functions.firestore
     .document("climbs/{climbID}")
@@ -41,3 +44,35 @@ export const onUpdate = functions.firestore
 
       logger.debug("done writing to bigquery", response);
     });
+
+export const registerForClasses = functions.region("us-east4").https.onCall(async (data, context) =>{
+  if (!context.auth) {
+    throw new Error("Auth must be there");
+  }
+  const userId = context.auth.uid;
+
+  if (!userId) throw new Error("You must be logged in");
+  if (!data) throw new Error("You must provide a body");
+  const {email, password} = data;
+
+  const credentials = await authService.login({
+    email,
+    password,
+  });
+
+
+  const scheduleService = new GymScheduleService({
+    gymId: "a1c0a008",
+    timeSlotIds: {
+      16: "125396",
+      18: "125397",
+      20: "125398",
+    },
+  });
+  const response = await scheduleService.registerForThisWeek({
+    credentials,
+    hourOfDay: 18,
+    days: [Days.Monday, Days.Wednesday, Days.Friday],
+  });
+  console.log("response", response);
+});
