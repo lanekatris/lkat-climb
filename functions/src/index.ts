@@ -45,7 +45,7 @@ export const onUpdate = functions.firestore
       logger.debug("done writing to bigquery", response);
     });
 
-export const registerForClasses = functions.region("us-east4").https.onCall(async (data, context) =>{
+export const registerForClasses = functions.https.onCall(async (data, context) =>{
   if (!context.auth) {
     throw new Error("Auth must be there");
   }
@@ -74,5 +74,6 @@ export const registerForClasses = functions.region("us-east4").https.onCall(asyn
     hourOfDay: 18,
     days: [Days.Monday, Days.Wednesday, Days.Friday],
   });
-  console.log("response", response);
+  console.log("responses", response);
+  return response;
 });

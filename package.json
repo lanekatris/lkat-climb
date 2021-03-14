@@ -10,6 +10,7 @@
     "lint": "eslint navigation/**/*.js commands/**/*.js components/**/*.js hooks/**/*.js screens/**/*.js utils/**/*.js --fix"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.14.1",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.7",
     "@react-navigation/drawer": "^5.12.3",
