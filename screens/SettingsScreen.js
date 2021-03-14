@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ScrollView } from 'react-native';
-import { ListItem, Icon, Input, Divider, Card, Button, Text } from 'react-native-elements';
+import { ListItem, Icon, Input, Card, Button, Text } from 'react-native-elements';
 import { useCallback, useEffect, useState } from 'react';
 import * as firebase from 'firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,16 +39,9 @@ export default function SettingsScreen() {
           <ListItem.Title>Log Out</ListItem.Title>
         </ListItem.Content>
       </ListItem>
-      {/* <ListItem> */}
-      {/*  <Icon name="calendar-today" type="material" /> */}
-      {/*  <ListItem.Title>Pre-register M/W/F in RhinoFit</ListItem.Title> */}
-      {/*  <ListItem.Content> */}
-      {/*    <Input placeholder="email@address.com" leftIcon={{ type: 'material', name: 'email' }} /> */}
-      {/*    <Input /> */}
-      {/*  </ListItem.Content> */}
-      {/* </ListItem> */}
       <Card>
         <Card.Title>Pre-register M/W/F in RhinoFit</Card.Title>
+        <Text>Input your RhinoFit credentials below:</Text>
         <Input
           placeholder="email@address.com"
           leftIcon={{ type: 'material', name: 'email' }}
@@ -67,10 +60,7 @@ export default function SettingsScreen() {
           type="outline"
           loading={loading}
           disabled={loading}
-          onPress={() => {
-            console.log('register', { email, password });
-            register();
-          }}
+          onPress={register}
         />
         {result && <Text>{JSON.stringify(result, null, 2)}</Text>}
       </Card>
