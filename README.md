@@ -20,3 +20,6 @@ Your credentials are stored in Firebase Auth, I don't see them. Your Rhinofit cr
 * https://expo.io/@loonison101/projects/lkat-climb
 * https://firebase.google.com/
 * https://github.com/expo-community/expo-firebase-starter
+
+# Example
+![Peek 2021-03-14 16-03](https://user-images.githubusercontent.com/3193546/111084795-9875c200-84ea-11eb-8ccf-aa00f50758dc.gif)
