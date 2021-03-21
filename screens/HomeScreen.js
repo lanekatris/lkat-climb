@@ -41,6 +41,8 @@ export default function HomeScreen() {
             <ListItem.Subtitle>
               <Stat amount={climb.stats.totalClimbs} text="Climbs" />
               <Seperator />
+              <Stat amount={climb.stats.totalAttempts} text="Attempts" />
+              <Seperator />
               <Stat amount={climb.stats.maxGrade} text="Max Grade" />
             </ListItem.Subtitle>
           </ListItem.Content>

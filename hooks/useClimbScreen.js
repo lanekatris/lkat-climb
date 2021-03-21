@@ -105,6 +105,11 @@ export function getStatsForClimb(climb, goals) {
     0
   );
 
+  stats.totalAttempts = Object.values(stats).reduce(
+    (total, { attempts }) => total + Math.round(attempts || 0),
+    0
+  );
+
   let maxGrade = 'n/a';
   Object.keys(stats).forEach((key) => {
     const val = stats[key];
