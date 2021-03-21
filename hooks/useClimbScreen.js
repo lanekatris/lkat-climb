@@ -69,6 +69,7 @@ export function getStatsForClimb(climb, goals) {
   GRADES.forEach((grade) => {
     stats[grade] = {
       current: 0,
+      attempts: 0,
     };
   });
 
@@ -79,6 +80,9 @@ export function getStatsForClimb(climb, goals) {
         break;
       case 'route-completed':
         stats[difficulty].current += 1;
+        break;
+      case 'attempt-created':
+        stats[difficulty].attempts += 1;
         break;
       default:
         console.warn('unknown', { createdOn, difficulty, type });
@@ -158,6 +162,12 @@ function useClimbScreen({ documentId }) {
     goals,
     increment: (difficulty) => incrementOrDecrement('route-completed', difficulty),
     decrement: (difficulty) => incrementOrDecrement('route-retracted', difficulty),
+    attempt: (difficulty) =>
+      documentRef.update({
+        events: firebase.firestore.FieldValue.arrayUnion(
+          createEvent('attempt-created', difficulty)
+        ),
+      }),
   };
 }
 
