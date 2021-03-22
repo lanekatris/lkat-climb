@@ -1,6 +1,7 @@
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
-import React from 'react';
-import { ListItem, Icon, Button } from 'react-native-elements';
+import React, { useState } from 'react';
+import { ListItem, Icon, Button, Header } from 'react-native-elements';
+import Timer from 'react-compound-timer';
 import useClimbScreen from '../hooks/useClimbScreen';
 import { GRADES } from '../utils/colors';
 
@@ -69,6 +70,80 @@ function Stats({ goals, grade, climb }) {
   );
 }
 
+function Timers() {
+  return (
+    <>
+      <View styles={timerStyles.header}>
+        <Text style={{ fontSize: 30, textAlign: 'center' }}>Timers</Text>
+      </View>
+      <TimerMe />
+      <TimerMe />
+    </>
+  );
+}
+
+function TimerMe() {
+  const [running, setRunning] = useState(false);
+
+  return (
+    <ListItem bottomDivider>
+      <ListItem.Content style={styles.item}>
+        <Timer startImmediately={false} timeToUpdate={10}>
+          {({ start, resume, pause, stop, reset, timerState }) => (
+            <>
+              <View>
+                <Text>
+                  <Timer.Minutes />:<Timer.Seconds />
+                </Text>
+              </View>
+              <View style={{ ...styles.item, justifyContent: 'flex-end' }}>
+                <Button
+                  type="clear"
+                  icon={
+                    <Icon
+                      name={running ? 'stop' : 'play-circle-outline'}
+                      type="material"
+                      size={FONT_SIZE}
+                    />
+                  }
+                  onPress={() => {
+                    if (running) {
+                      // stop
+                      stop();
+                    } else {
+                      // run
+                      start();
+                      // resume();
+                    }
+                    setRunning(!running);
+                  }}
+                />
+                <Button
+                  type="clear"
+                  icon={<Icon name="delete-outline" type="material" size={FONT_SIZE} />}
+                  onPress={() => {
+                    console.log('delete me');
+                  }}
+                />
+              </View>
+            </>
+          )}
+        </Timer>
+      </ListItem.Content>
+    </ListItem>
+  );
+}
+
+const timerStyles = StyleSheet.create({
+  header: {
+    fontSize: 10,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    justifyContent: 'center',
+  },
+});
+
 export default function ClimbScreen({ route }) {
   const {
     params: { id },
@@ -77,6 +152,7 @@ export default function ClimbScreen({ route }) {
 
   return (
     <ScrollView>
+      {climb && climb.stats && <Timers />}
       {climb &&
         climb.stats &&
         GRADES.map((grade, i) => (
