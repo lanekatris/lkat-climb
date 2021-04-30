@@ -152,7 +152,7 @@ export default function ClimbScreen({ route }) {
 
   return (
     <ScrollView>
-      {climb && climb.stats && <Timers />}
+      {/* {climb && climb.stats && <Timers />} */}
       {climb &&
         climb.stats &&
         GRADES.map((grade, i) => (
